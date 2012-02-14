@@ -9,7 +9,7 @@ sentry_hipchat.models
 from django import forms
 
 from sentry.models import ProjectOption
-from sentry.plugins import Plugin
+from sentry.plugins import Plugin, register
 from sentry.plugins.helpers import get_option
 
 import urllib
@@ -22,6 +22,7 @@ class HipchatOptionsForm(forms.Form):
     room = forms.CharField(help_text="Room name or ID.")
 
 
+@register
 class HipchatMessage(Plugin):
     title = 'Hipchat'
     conf_title = 'Hipchat'
