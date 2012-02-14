@@ -15,6 +15,7 @@ from sentry.plugins.helpers import get_option
 import urllib
 import urllib2
 import json
+import logging
 
 
 class HipchatOptionsForm(forms.Form):
@@ -55,7 +56,9 @@ class HipchatMessage(Plugin):
             if token and room:
                 self.send_payload(token, room, '[%s] %s' % (event.server_name, event.message))
         except Exception as e:
-            print e
+            # Avoid blocking event registration
+            logger = logging.getLogger('sentry.plugins.hipchat')
+            logger.error(str(e))
 
     def send_payload(self, token, room, message):
         url = "https://api.hipchat.com/v1/rooms/message"
@@ -72,4 +75,9 @@ class HipchatMessage(Plugin):
         response = urllib2.urlopen(request)
         raw_response_data = response.read()
         response_data = json.loads(raw_response_data)
-        print response_data
+        if 'status' not in response_data:
+            logger = logging.getLogger('sentry.plugins.hipchat')
+            logger.error('Unexpected response')
+        if response_data['status'] != 'sent':
+            logger = logging.getLogger('sentry.plugins.hipchat')
+            logger.error('Event was not sent to hipchat')
