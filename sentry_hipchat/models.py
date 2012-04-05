@@ -10,7 +10,6 @@ from django import forms
 
 from sentry.models import ProjectOption
 from sentry.plugins import Plugin, register
-from sentry.plugins.helpers import get_option
 
 import urllib
 import urllib2
@@ -25,40 +24,21 @@ class HipchatOptionsForm(forms.Form):
 
 @register
 class HipchatMessage(Plugin):
+    author = 'Xavier Ordoquy'
+    author_url = 'https://github.com/linovia/sentry-hipchat'
     title = 'Hipchat'
     conf_title = 'Hipchat'
     conf_key = 'hipchat'
     project_conf_form = HipchatOptionsForm
 
-    def __init__(self, *args, **kwargs):
-        super(HipchatMessage, self).__init__(*args, **kwargs)
-
     def is_configured(self, project):
-        return bool(self.get_config(project))
-
-    def get_config(self, project):
-        if project.pk not in self._config:
-            prefix = self.get_conf_key()
-            config = {}
-            for option in ('room', 'token'):
-                try:
-                    value = ProjectOption.objects.get_value(project, '%s:%s' % (prefix, option))
-                except KeyError:
-                    return {}
-                config[option] = value
-            self._config[project.pk] = config
-        return self._config[project.pk]
+        return all((self.get_option(k, project) for k in ('room', 'token')))
 
     def post_process(self, group, event, is_new, is_sample, **kwargs):
-        try:
-            token = get_option('hipchat:token', event.project)
-            room = get_option('hipchat:room', event.project)
-            if token and room:
-                self.send_payload(token, room, '[%s] %s' % (event.server_name, event.message))
-        except Exception as e:
-            # Avoid blocking event registration
-            logger = logging.getLogger('sentry.plugins.hipchat')
-            logger.error(str(e))
+        token = self.get_option('token', event.project)
+        room = self.get_option('room', event.project)
+        if token and room:
+            self.send_payload(token, room, '[%s] %s' % (event.server_name, event.message))
 
     def send_payload(self, token, room, message):
         url = "https://api.hipchat.com/v1/rooms/message"
