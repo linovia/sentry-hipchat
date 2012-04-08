@@ -22,7 +22,7 @@ install_requires = [
 
 setup(
     name='sentry-hipchat',
-    version='0.1.0',
+    version='0.2.0',
     author='Xavier Ordoquy',
     author_email='xordoquy@linovia.com',
     url='http://github.com/linovia/sentry-hipchat',
