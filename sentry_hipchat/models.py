@@ -8,6 +8,7 @@ sentry_hipchat.models
 
 from django import forms
 
+from sentry.conf import settings
 from sentry.models import ProjectOption
 from sentry.plugins import Plugin, register
 
@@ -45,11 +46,15 @@ class HipchatMessage(Plugin):
         token = self.get_option('token', event.project)
         room = self.get_option('room', event.project)
         level = event.get_level_display().upper()
+        link = '%s/%s/group/%d/' % (settings.URL_PREFIX, group.project.slug, group.id)
+
         if token and room:
-            self.send_payload(token, room, '%(site)s[%(server)s] %(message)s' % {
+            self.send_payload(token, room, '%(site)s[%(server)s] %(message)s %(link)s' % {
                 'server': event.server_name,
                 'site': ('%s ' % event.site) if event.site else '',
-                'message': event.message},
+                'message': event.message,
+                'link': link,
+                },
                               color=COLORS.get(level, 'purple'))
 
     def send_payload(self, token, room, message, color='red'):
