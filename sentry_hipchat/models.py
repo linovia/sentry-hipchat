@@ -46,7 +46,7 @@ class HipchatMessage(Plugin):
         token = self.get_option('token', event.project)
         room = self.get_option('room', event.project)
         level = event.get_level_display().upper()
-        link = '%s/%s/group/%d/' % (settings.URL_PREFIX, group.project.slug, group.id)
+        link = '<a href="%s/%s/group/%d/">(link)</a>' % (settings.URL_PREFIX, group.project.slug, group.id)
 
         if token and room:
             self.send_payload(token, room, '%(site)s[%(server)s] %(message)s %(link)s' % {
