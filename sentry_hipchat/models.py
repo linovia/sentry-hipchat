@@ -16,6 +16,13 @@ import urllib2
 import json
 import logging
 
+COLORS = dict(
+    ERROR = 'red',
+    WARNING = 'yellow',
+    INFO = 'green',
+    DEBUG = 'purple',
+    )
+
 
 class HipchatOptionsForm(forms.Form):
     token = forms.CharField(help_text="Your hipchat API token.")
@@ -42,7 +49,8 @@ class HipchatMessage(Plugin):
             self.send_payload(token, room, '[%(server)s][%(level)s] %(message)s' % {
                 'server': event.server_name,
                 'level': level,
-                'message': event.message})
+                'message': event.message},
+                              color=COLORS.get(level, 'purple'))
 
     def send_payload(self, token, room, message, color='red'):
         url = "https://api.hipchat.com/v1/rooms/message"
