@@ -37,10 +37,14 @@ class HipchatMessage(Plugin):
     def post_process(self, group, event, is_new, is_sample, **kwargs):
         token = self.get_option('token', event.project)
         room = self.get_option('room', event.project)
+        level = event.get_level_display().upper()
         if token and room:
-            self.send_payload(token, room, '[%s] %s' % (event.server_name, event.message))
+            self.send_payload(token, room, '[%(server)s][%(level)s] %(message)s' % {
+                'server': event.server_name,
+                'level': level,
+                'message': event.message})
 
-    def send_payload(self, token, room, message):
+    def send_payload(self, token, room, message, color='red'):
         url = "https://api.hipchat.com/v1/rooms/message"
         values = {
             'auth_token': token,
@@ -48,7 +52,7 @@ class HipchatMessage(Plugin):
             'from': 'Sentry',
             'message': message,
             'notify': False,
-            'color': 'red',
+            'color': color,
         }
         data = urllib.urlencode(values)
         request = urllib2.Request(url, data)
