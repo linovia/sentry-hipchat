@@ -46,9 +46,8 @@ class HipchatMessage(Plugin):
         room = self.get_option('room', event.project)
         level = event.get_level_display().upper()
         if token and room:
-            self.send_payload(token, room, '[%(server)s][%(level)s] %(message)s' % {
+            self.send_payload(token, room, '[%(server)s] %(message)s' % {
                 'server': event.server_name,
-                'level': level,
                 'message': event.message},
                               color=COLORS.get(level, 'purple'))
 
