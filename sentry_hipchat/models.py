@@ -8,6 +8,7 @@ sentry_hipchat.models
 
 from django import forms
 
+from sentry.conf import settings
 from sentry.models import ProjectOption
 from sentry.plugins import Plugin, register
 
@@ -15,6 +16,13 @@ import urllib
 import urllib2
 import json
 import logging
+
+COLORS = dict(
+    ERROR = 'red',
+    WARNING = 'yellow',
+    INFO = 'green',
+    DEBUG = 'purple',
+    )
 
 
 class HipchatOptionsForm(forms.Form):
@@ -37,10 +45,19 @@ class HipchatMessage(Plugin):
     def post_process(self, group, event, is_new, is_sample, **kwargs):
         token = self.get_option('token', event.project)
         room = self.get_option('room', event.project)
-        if token and room:
-            self.send_payload(token, room, '[%s] %s' % (event.server_name, event.message))
+        level = event.get_level_display().upper()
+        link = '<a href="%s/%s/group/%d/">(link)</a>' % (settings.URL_PREFIX, group.project.slug, group.id)
 
-    def send_payload(self, token, room, message):
+        if token and room:
+            self.send_payload(token, room, '%(site)s[%(server)s] %(message)s %(link)s' % {
+                'server': event.server_name,
+                'site': ('%s ' % event.site) if event.site else '',
+                'message': event.message,
+                'link': link,
+                },
+                              color=COLORS.get(level, 'purple'))
+
+    def send_payload(self, token, room, message, color='red'):
         url = "https://api.hipchat.com/v1/rooms/message"
         values = {
             'auth_token': token,
@@ -48,7 +65,7 @@ class HipchatMessage(Plugin):
             'from': 'Sentry',
             'message': message,
             'notify': False,
-            'color': 'red',
+            'color': color,
         }
         data = urllib.urlencode(values)
         request = urllib2.Request(url, data)
