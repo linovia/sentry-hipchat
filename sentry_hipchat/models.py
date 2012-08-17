@@ -74,7 +74,7 @@ class HipchatMessage(Plugin):
             'room_id': room,
             'from': 'Sentry',
             'message': message,
-            'notify': notify,
+            'notify': int(notify),
             'color': color,
         }
         data = urllib.urlencode(values)
