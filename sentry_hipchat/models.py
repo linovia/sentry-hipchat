@@ -61,7 +61,7 @@ class HipchatMessage(Plugin):
             self.send_payload(token, room, '%(site)s[%(server)s]%(project_name)s %(message)s %(link)s' % {
                 'server': event.server_name,
                 'site': ('%s ' % event.site) if event.site else '',
-                'project_name': (' <%s>' % event.project.name) if include_project_name else '',
+                'project_name': (' <strong>%s</strong>' % event.project.name) if include_project_name else '',
                 'message': event.message,
                 'link': link,
                 },
