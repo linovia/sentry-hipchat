@@ -30,7 +30,7 @@ class HipchatOptionsForm(forms.Form):
     room = forms.CharField(help_text="Room name or ID.")
     new_only = form.BooleanField(help_text='Only send new messages.', required=False)
     notify = forms.BooleanField(help_text='Notify message in chat window.', required=False)
-    include_project_name = form.BooleanField(help_text='Include project name in message.', required=False)
+    include_project_name = forms.BooleanField(help_text='Include project name in message.', required=False)
 
 
 @register
@@ -58,10 +58,10 @@ class HipchatMessage(Plugin):
         link = '<a href="%s/%s/group/%d/">(link)</a>' % (settings.URL_PREFIX, group.project.slug, group.id)
 
         if token and room:
-            self.send_payload(token, room, '%(project_name)s %(site)s[%(server)s] %(message)s %(link)s' % {
+            self.send_payload(token, room, '%(project_name)s%(site)s[%(server)s] %(message)s %(link)s' % {
                 'server': event.server_name,
                 'site': ('%s ' % event.site) if event.site else '',
-                'project_name': event.project.name if include_project_name else '',
+                'project_name': ('%s ' % event.project.name) if include_project_name else '',
                 'message': event.message,
                 'link': link,
                 },
