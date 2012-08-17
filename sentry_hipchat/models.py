@@ -28,7 +28,7 @@ COLORS = dict(
 class HipchatOptionsForm(forms.Form):
     token = forms.CharField(help_text="Your hipchat API token.")
     room = forms.CharField(help_text="Room name or ID.")
-    new_only = form.BooleanField(help_text='Only send new messages.', required=False)
+    new_only = forms.BooleanField(help_text='Only send new messages.', required=False)
     notify = forms.BooleanField(help_text='Notify message in chat window.', required=False)
     include_project_name = forms.BooleanField(help_text='Include project name in message.', required=False)
 
