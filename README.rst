@@ -11,14 +11,6 @@ Install the package via ``pip``::
 
     pip install sentry-hipchat
 
-Add ``sentry_hipchat`` to your ``INSTALLED_APPS``::
-
-    INSTALLED_APPS = (
-        # ...
-        'sentry',
-        'sentry_hipchat',
-    )
-
 Configuration
 -------------
 
