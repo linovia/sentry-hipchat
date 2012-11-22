@@ -40,7 +40,10 @@ class HipchatMessage(Plugin):
     author_url = 'https://github.com/linovia/sentry-hipchat'
     version = sentry_hipchat.VERSION
     description = "Event notification to Hipchat."
-
+    resource_links = [
+        ('Bug Tracker', 'https://github.com/linovia/sentry-hipchat/issues'),
+        ('Source', 'https://github.com/linovia/sentry-hipchat'),
+    ]
     slug = 'hipchat'
     title = 'Hipchat'
     conf_title = title

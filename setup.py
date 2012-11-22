@@ -17,7 +17,7 @@ tests_require = [
 ]
 
 install_requires = [
-    'sentry>=3.8.0',
+    'sentry>=4.6.0',
 ]
 
 setup(
@@ -36,6 +36,11 @@ setup(
     extras_require={'test': tests_require},
     test_suite='runtests.runtests',
     include_package_data=True,
+    entry_points={
+        'sentry.plugins': [
+            'hipchat = sentry_hipchat.models:HipchatMessage',
+         ],
+    },
     classifiers=[
         'Framework :: Django',
         'Intended Audience :: Developers',
