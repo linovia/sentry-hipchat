@@ -9,7 +9,7 @@ sentry_hipchat.models
 from django import forms
 
 from sentry.conf import settings
-from sentry.plugins import Plugin, register
+from sentry.plugins import Plugin
 
 import sentry_hipchat
 
@@ -34,7 +34,6 @@ class HipchatOptionsForm(forms.Form):
     include_project_name = forms.BooleanField(help_text='Include project name in message.', required=False)
 
 
-@register
 class HipchatMessage(Plugin):
     author = 'Xavier Ordoquy'
     author_url = 'https://github.com/linovia/sentry-hipchat'
