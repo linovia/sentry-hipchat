@@ -8,7 +8,8 @@ sentry_hipchat.models
 
 from django import forms
 
-from sentry.plugins import Plugin
+from sentry.conf import settings
+from sentry.plugins.bases.notify import NotifyPlugin
 
 import sentry_hipchat
 
@@ -34,7 +35,7 @@ class HipchatOptionsForm(forms.Form):
     include_project_name = forms.BooleanField(help_text='Include project name in message.', required=False)
 
 
-class HipchatMessage(Plugin):
+class HipchatMessage(NotifyPlugin):
     author = 'Xavier Ordoquy'
     author_url = 'https://github.com/linovia/sentry-hipchat'
     version = sentry_hipchat.VERSION
