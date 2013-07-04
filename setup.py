@@ -13,7 +13,9 @@ from setuptools import setup, find_packages
 
 
 tests_require = [
-    'nose==1.1.2',
+    'pytest',
+    'pytest-django-lite',
+    'mock',
 ]
 
 install_requires = [
