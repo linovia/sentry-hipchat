@@ -77,7 +77,7 @@ class HipchatMessage(NotifyPlugin):
         notify = self.get_option('notify', event.project) or False
         include_project_name = self.get_option('include_project_name', event.project) or False
         level = event.get_level_display().upper()
-        link = self.get_group_url(group)
+        link = self.get_url(group)
 
         if token and room:
             self.send_payload(token, room, '[%(level)s]%(project_name)s %(message)s %(link)s' % {
