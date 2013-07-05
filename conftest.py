@@ -15,7 +15,7 @@ def pytest_configure(config):
             DATABASE_NAME=':memory:',
             TEST_DATABASE_NAME=':memory:',
             # INSTALLED_APPS=INSTALLED_APPS,
-            # ROOT_URLCONF='',
+            ROOT_URLCONF='sentry.conf.urls',
             # DEBUG=False,
             # SITE_ID=1,
             # BROKER_HOST="localhost",
