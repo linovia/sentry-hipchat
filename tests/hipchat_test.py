@@ -5,6 +5,7 @@ from mock import Mock, call
 import pytest
 
 from sentry_hipchat.models import HipchatMessage
+from sentry.conf import settings
 
 
 class PayLoadTest(object):
@@ -58,6 +59,10 @@ class TestPostProcess(object):
         Make sure known messages aren't sent again if the new_only option is on
         """
         group = Mock()
+        group.id = 1
+        group.project.slug = "demo"
+
+        settings.URL_PREFIX = 'http://localhost'
 
         event.project.new_only = True
         plugin.post_process(group, event, False, False)
@@ -65,9 +70,8 @@ class TestPostProcess(object):
 
         event.project.new_only = False
         plugin.post_process(group, event, False, False)
-        print plugin.send_payload.mock_calls
         assert plugin.send_payload.mock_calls == [
             call('abcdefghijklmn', 'test',
-                '[ERROR] <strong>test project</strong> An error has occured [http://localhost/someurl]',
+                '[ERROR] <strong>test project</strong> An error has occured [<a href="http://localhost/demo/group/1/">view on sentry</a>]',
                 False, color='red')
         ]
