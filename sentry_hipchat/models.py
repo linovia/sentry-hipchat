@@ -8,8 +8,8 @@ sentry_hipchat.models
 
 from django import forms
 
-from sentry.conf import settings
 from sentry.plugins.bases.notify import NotifyPlugin
+from sentry.conf import settings
 
 import sentry_hipchat
 
@@ -17,6 +17,7 @@ import urllib
 import urllib2
 import json
 import logging
+
 
 COLORS = {
     'ALERT': 'orange',
@@ -77,10 +78,10 @@ class HipchatMessage(NotifyPlugin):
         notify = self.get_option('notify', event.project) or False
         include_project_name = self.get_option('include_project_name', event.project) or False
         level = event.get_level_display().upper()
-        link = self.get_group_url(group)
+        link = '%s/%s/group/%d/' % (settings.URL_PREFIX, group.project.slug, group.id)
 
         if token and room:
-            self.send_payload(token, room, '[%(level)s]%(project_name)s %(message)s %(link)s' % {
+            self.send_payload(token, room, '[%(level)s]%(project_name)s %(message)s [<a href="%(link)s">view on sentry</a>]' % {
                 'level': level,
                 'project_name': (' <strong>%s</strong>' % event.project.name) if include_project_name else '',
                 'message': event.message,

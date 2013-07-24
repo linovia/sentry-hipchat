@@ -13,7 +13,9 @@ from setuptools import setup, find_packages
 
 
 tests_require = [
-    'nose==1.1.2',
+    'pytest',
+    'pytest-django-lite',
+    'mock',
 ]
 
 install_requires = [
@@ -22,7 +24,7 @@ install_requires = [
 
 setup(
     name='sentry-hipchat',
-    version='0.3.1',
+    version='0.4.0',
     author='Xavier Ordoquy',
     author_email='xordoquy@linovia.com',
     url='http://github.com/linovia/sentry-hipchat',
