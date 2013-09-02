@@ -9,10 +9,8 @@ sentry_hipchat.models
 from django import forms
 
 from sentry.plugins.bases.notify import NotifyPlugin
-try:
-    from sentry.conf import settings
-except ImportError:
-    from django.conf import settings
+from sentry.utils import settings
+from sentry.conf import server
 
 import sentry_hipchat
 
@@ -72,6 +70,7 @@ class HipchatMessage(NotifyPlugin):
             }, notify, color=COLORS['ALERT'])
 
     def post_process(self, group, event, is_new, is_sample, **kwargs):
+
         new_only = self.get_option('new_only', event.project)
         if new_only and not is_new:
             return
@@ -81,7 +80,7 @@ class HipchatMessage(NotifyPlugin):
         notify = self.get_option('notify', event.project) or False
         include_project_name = self.get_option('include_project_name', event.project) or False
         level = event.get_level_display().upper()
-        link = '%s/%s/group/%d/' % (settings.URL_PREFIX, group.project.slug, group.id)
+        link = group.get_absolute_url()
 
         if token and room:
             self.send_payload(token, room, '[%(level)s]%(project_name)s %(message)s [<a href="%(link)s">view on sentry</a>]' % {
