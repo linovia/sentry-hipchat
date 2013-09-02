@@ -9,7 +9,10 @@ sentry_hipchat.models
 from django import forms
 
 from sentry.plugins.bases.notify import NotifyPlugin
-from sentry.conf import settings
+try:
+    from sentry.conf import settings
+except ImportError:
+    from django.conf import settings
 
 import sentry_hipchat
 
