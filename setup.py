@@ -39,6 +39,9 @@ setup(
     test_suite='runtests.runtests',
     include_package_data=True,
     entry_points={
+        'sentry.apps': [
+            'sentry_hipchat = sentry_hipchat ',
+        ],
         'sentry.plugins': [
             'hipchat = sentry_hipchat.models:HipchatMessage',
          ],
