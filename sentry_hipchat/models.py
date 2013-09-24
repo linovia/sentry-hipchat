@@ -81,8 +81,9 @@ class HipchatMessage(NotifyPlugin):
         include_project_name = self.get_option('include_project_name', event.project) or False
         level = event.get_level_display().upper()
         link = group.get_absolute_url()
+        is_muted = group.is_muted()
 
-        if token and room:
+        if token and room and not is_muted:
             self.send_payload(token, room, '[%(level)s]%(project_name)s %(message)s [<a href="%(link)s">view on sentry</a>]' % {
                 'level': level,
                 'project_name': (' <strong>%s</strong>' % event.project.name) if include_project_name else '',
