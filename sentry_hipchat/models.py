@@ -83,10 +83,10 @@ class HipchatMessage(NotifyPlugin):
         link = group.get_absolute_url()
 
         if token and room:
-            self.send_payload(token, room, '[%(level)s]%(project_name)s %(message)s [<a href="%(link)s">view on sentry</a>]' % {
+            self.send_payload(token, room, '[%(level)s]%(project_name)s %(message)s [<a href="%(link)s">view</a>]' % {
                 'level': level,
                 'project_name': (' <strong>%s</strong>' % event.project.name) if include_project_name else '',
-                'message': event.message,
+                'message': event.message_top(),
                 'link': link,
             }, notify, color=COLORS.get(level, 'purple'))
 
