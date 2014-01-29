@@ -7,10 +7,9 @@ sentry_hipchat.models
 """
 
 from django import forms
+from django.conf import settings
 
 from sentry.plugins.bases.notify import NotifyPlugin
-from sentry.utils import settings
-from sentry.conf import server
 
 import sentry_hipchat
 
@@ -51,6 +50,7 @@ class HipchatMessage(NotifyPlugin):
     conf_title = title
     conf_key = 'hipchat'
     project_conf_form = HipchatOptionsForm
+    timeout = getattr(settings, 'SENTRY_HIPCHAT_TIMEOUT', 3)
 
     def is_configured(self, project):
         return all((self.get_option(k, project) for k in ('room', 'token')))
@@ -103,7 +103,7 @@ class HipchatMessage(NotifyPlugin):
         }
         data = urllib.urlencode(values)
         request = urllib2.Request(url, data)
-        response = urllib2.urlopen(request)
+        response = urllib2.urlopen(request, timeout=self.timeout)
         raw_response_data = response.read()
         response_data = json.loads(raw_response_data)
         if 'status' not in response_data:
