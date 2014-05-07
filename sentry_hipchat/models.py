@@ -79,7 +79,7 @@ class HipchatMessage(NotifyPlugin):
         room = self.get_option('room', event.project)
         notify = self.get_option('notify', event.project) or False
         include_project_name = self.get_option('include_project_name', event.project) or False
-        level = event.get_level_display().upper()
+        level = group.get_level_display().upper()
         link = group.get_absolute_url()
         is_muted = group.is_muted()
 
