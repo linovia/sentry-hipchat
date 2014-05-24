@@ -27,6 +27,8 @@ COLORS = {
     'DEBUG': 'purple',
 }
 
+DEFAULT_ENDPOINT = "https://api.hipchat.com/v1/rooms/message"
+
 
 class HipchatOptionsForm(forms.Form):
     token = forms.CharField(help_text="Your hipchat API v1 token.")
@@ -34,6 +36,8 @@ class HipchatOptionsForm(forms.Form):
     new_only = forms.BooleanField(help_text='Only send new messages.', required=False)
     notify = forms.BooleanField(help_text='Notify message in chat window.', required=False)
     include_project_name = forms.BooleanField(help_text='Include project name in message.', required=False)
+    endpoint = forms.CharField(help_text="Custom API endpoint to send notifications to.", required=False,
+                               widget=forms.TextInput(attrs={'placeholder': DEFAULT_ENDPOINT}))
 
 
 class HipchatMessage(NotifyPlugin):
@@ -70,7 +74,6 @@ class HipchatMessage(NotifyPlugin):
             }, notify, color=COLORS['ALERT'])
 
     def post_process(self, group, event, is_new, is_sample, **kwargs):
-
         new_only = self.get_option('new_only', event.project)
         if new_only and not is_new:
             return
@@ -92,7 +95,7 @@ class HipchatMessage(NotifyPlugin):
             }, notify, color=COLORS.get(level, 'purple'))
 
     def send_payload(self, token, room, message, notify, color='red'):
-        url = "https://api.hipchat.com/v1/rooms/message"
+        url = self.get_option('endpoint', event.endpoint) or DEFAULT_ENDPOINT
         values = {
             'auth_token': token,
             'room_id': room,
