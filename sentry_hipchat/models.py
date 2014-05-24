@@ -33,7 +33,6 @@ DEFAULT_ENDPOINT = "https://api.hipchat.com/v1/rooms/message"
 class HipchatOptionsForm(forms.Form):
     token = forms.CharField(help_text="Your hipchat API v1 token.")
     room = forms.CharField(help_text="Room name or ID.")
-    new_only = forms.BooleanField(help_text='Only send new messages.', required=False)
     notify = forms.BooleanField(help_text='Notify message in chat window.', required=False)
     include_project_name = forms.BooleanField(help_text='Include project name in message.', required=False)
     endpoint = forms.CharField(help_text="Custom API endpoint to send notifications to.", required=False,
@@ -73,26 +72,22 @@ class HipchatMessage(NotifyPlugin):
                 'link': alert.get_absolute_url(),
             }, notify, color=COLORS['ALERT'])
 
-    def post_process(self, group, event, is_new, is_sample, **kwargs):
-        new_only = self.get_option('new_only', event.project)
-        if new_only and not is_new:
-            return
-
+    def notify_users(self, group, event, fail_silently=False):
         token = self.get_option('token', event.project)
         room = self.get_option('room', event.project)
         notify = self.get_option('notify', event.project) or False
         include_project_name = self.get_option('include_project_name', event.project) or False
         level = group.get_level_display().upper()
         link = group.get_absolute_url()
-        is_muted = group.is_muted()
 
-        if token and room and not is_muted:
+        if token and room:
             self.send_payload(token, room, '[%(level)s]%(project_name)s %(message)s [<a href="%(link)s">view</a>]' % {
                 'level': level,
                 'project_name': (' <strong>%s</strong>' % event.project.name) if include_project_name else '',
                 'message': event.error(),
                 'link': link,
             }, notify, color=COLORS.get(level, 'purple'))
+
 
     def send_payload(self, token, room, message, notify, color='red'):
         url = self.get_option('endpoint', event.endpoint) or DEFAULT_ENDPOINT

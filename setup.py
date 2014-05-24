@@ -14,12 +14,11 @@ from setuptools import setup, find_packages
 
 tests_require = [
     'pytest',
-    'pytest-django-lite',
     'mock',
 ]
 
 install_requires = [
-    'sentry>=4.6.0',
+    'sentry>=6.0.0',
 ]
 
 setup(

@@ -1,11 +1,8 @@
-"""
-"""
-
 from mock import Mock, call
 import pytest
 
 from sentry_hipchat.models import HipchatMessage
-from sentry.conf import settings
+from django.conf import settings
 
 
 class PayLoadTest(object):
@@ -28,10 +25,8 @@ def event():
     for k, v in DEFAULT_PLUGIN_CONFIGURATION.items():
         setattr(result.project, k, v)
 
-    result.get_level_display = Mock()
-    result.get_level_display.return_value = 'ERROR'
-
     result.message = 'An error has occured'
+    result.error.return_value = result.message
 
     return result
 
@@ -40,6 +35,7 @@ def event():
 def plugin():
     def get_option(k, d):
         return getattr(d, k)
+
     plugin = HipchatMessage()
     plugin.get_option = get_option
 
@@ -53,25 +49,20 @@ def plugin():
 
 
 class TestPostProcess(object):
-
-    def test_old_message(self, event, plugin):
+    def test_notify_users(self, event, plugin):
         """
         Make sure known messages aren't sent again if the new_only option is on
         """
         group = Mock()
         group.id = 1
         group.project.slug = "demo"
+        group.get_absolute_url.return_value = 'http://localhost/demo/group/1/'
+        group.get_level_display.return_value = 'ERROR'
 
-        settings.URL_PREFIX = 'http://localhost'
+        plugin.notify_users(group, event)
 
-        event.project.new_only = True
-        plugin.post_process(group, event, False, False)
-        assert plugin.send_payload.mock_calls == []
-
-        event.project.new_only = False
-        plugin.post_process(group, event, False, False)
         assert plugin.send_payload.mock_calls == [
             call('abcdefghijklmn', 'test',
-                '[ERROR] <strong>test project</strong> An error has occured [<a href="http://localhost/demo/group/1/">view on sentry</a>]',
+                '[ERROR] <strong>test project</strong> An error has occured [<a href="http://localhost/demo/group/1/">view</a>]',
                 False, color='red')
         ]

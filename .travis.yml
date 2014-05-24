@@ -1,0 +1,12 @@
+language: python
+python:
+  - "2.7"
+install:
+  - time make develop
+script:
+  - py.test tests/ --cov sentry --cov-report term-missing
+notifications:
+  irc:
+    channels: "irc.freenode.org#sentry"
+    on_success: change
+    on_failure: change
