@@ -64,13 +64,21 @@ class HipchatMessage(NotifyPlugin):
         room = self.get_option('room', project)
         notify = self.get_option('notify', project) or False
         include_project_name = self.get_option('include_project_name', project) or False
+        endpoint = self.get_option('endpoint', alert.project) or DEFAULT_ENDPOINT
 
         if token and room:
-            self.send_payload(token, room, '[ALERT]%(project_name)s %(message)s %(link)s' % {
-                'project_name': (' <strong>%s</strong>' % project.name) if include_project_name else '',
-                'message': alert.message,
-                'link': alert.get_absolute_url(),
-            }, notify, color=COLORS['ALERT'])
+            self.send_payload(
+                endpoint=endpoint,
+                token=token,
+                room=room,
+                message='[ALERT]%(project_name)s %(message)s %(link)s' % {
+                    'project_name': (' <strong>%s</strong>' % project.name) if include_project_name else '',
+                    'message': alert.message,
+                    'link': alert.get_absolute_url(),
+                },
+                notify=notify,
+                color=COLORS['ALERT'],
+            )
 
     def notify_users(self, group, event, fail_silently=False):
         token = self.get_option('token', event.project)
@@ -79,18 +87,26 @@ class HipchatMessage(NotifyPlugin):
         include_project_name = self.get_option('include_project_name', event.project) or False
         level = group.get_level_display().upper()
         link = group.get_absolute_url()
+        endpoint = self.get_option('endpoint', event.project) or DEFAULT_ENDPOINT
+
 
         if token and room:
-            self.send_payload(token, room, '[%(level)s]%(project_name)s %(message)s [<a href="%(link)s">view</a>]' % {
-                'level': level,
-                'project_name': (' <strong>%s</strong>' % event.project.name) if include_project_name else '',
-                'message': event.error(),
-                'link': link,
-            }, notify, color=COLORS.get(level, 'purple'))
+            self.send_payload(
+                endpoint=endpoint,
+                token=token,
+                room=room,
+                message='[%(level)s]%(project_name)s %(message)s [<a href="%(link)s">view</a>]' % {
+                    'level': level,
+                    'project_name': (' <strong>%s</strong>' % event.project.name) if include_project_name else '',
+                    'message': event.error(),
+                    'link': link,
+                },
+                notify=notify,
+                color=COLORS.get(level, 'purple'),
+            )
 
 
-    def send_payload(self, token, room, message, notify, color='red'):
-        url = self.get_option('endpoint', event.endpoint) or DEFAULT_ENDPOINT
+    def send_payload(self, endpoint, token, room, message, notify, color='red'):
         values = {
             'auth_token': token,
             'room_id': room,
@@ -100,7 +116,7 @@ class HipchatMessage(NotifyPlugin):
             'color': color,
         }
         data = urllib.urlencode(values)
-        request = urllib2.Request(url, data)
+        request = urllib2.Request(endpoint, data)
         response = urllib2.urlopen(request, timeout=self.timeout)
         raw_response_data = response.read()
         response_data = json.loads(raw_response_data)
