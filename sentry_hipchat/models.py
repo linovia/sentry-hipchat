@@ -20,7 +20,7 @@ import logging
 
 
 COLORS = {
-    'ALERT': 'orange',
+    'ALERT': 'red',
     'ERROR': 'red',
     'WARNING': 'yellow',
     'INFO': 'green',
