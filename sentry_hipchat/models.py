@@ -110,9 +110,9 @@ class HipchatMessage(NotifyPlugin):
     def send_payload(self, endpoint, token, room, message, notify, color='red'):
         values = {
             'auth_token': token,
-            'room_id': room,
+            'room_id': room.encode('u8'),
             'from': 'Sentry',
-            'message': message,
+            'message': message.encode('u8'),
             'notify': int(notify),
             'color': color,
         }
