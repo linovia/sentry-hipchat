@@ -8,6 +8,7 @@ sentry_hipchat.models
 
 from django import forms
 from django.conf import settings
+from django.utils.html import escape
 
 from sentry.plugins.bases.notify import NotifyPlugin
 
@@ -72,8 +73,8 @@ class HipchatMessage(NotifyPlugin):
                 token=token,
                 room=room,
                 message='[ALERT]%(project_name)s %(message)s %(link)s' % {
-                    'project_name': (' <strong>%s</strong>' % project.name) if include_project_name else '',
-                    'message': alert.message,
+                    'project_name': (' <strong>%s</strong>' % escape(project.name)) if include_project_name else '',
+                    'message': escape(alert.message),
                     'link': alert.get_absolute_url(),
                 },
                 notify=notify,
@@ -97,10 +98,10 @@ class HipchatMessage(NotifyPlugin):
                 token=token,
                 room=room,
                 message='[%(level)s]%(project_name)s %(message)s [<a href="%(link)s">view</a>]' % {
-                    'level': level,
-                    'project_name': (' <strong>%s</strong>' % project.name) if include_project_name else '',
-                    'message': event.error(),
-                    'link': link,
+                    'level': escape(level),
+                    'project_name': (' <strong>%s</strong>' % escape(project.name)) if include_project_name else '',
+                    'message': escape(event.error()),
+                    'link': escape(link),
                 },
                 notify=notify,
                 color=COLORS.get(level, 'purple'),
